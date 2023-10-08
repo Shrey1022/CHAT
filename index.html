@@ -1,22 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatGPT Interface</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Chatbot</title>
+    <style>
+/* Style the chat container */
+#chat-container {
+    width: 300px; /* Adjust the width as needed */
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Style chat messages */
+#chat-display {
+    max-height: 300px; /* Set a max height for the chat display */
+    overflow-y: auto; /* Enable vertical scrolling if needed */
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+/* Style user input */
+#user-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Style send button */
+#send-button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Style chat message bubbles */
+#chat-display div {
+    margin: 5px 0;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* Style user message */
+#chat-display div:nth-child(odd) {
+    background-color: #007bff;
+    color: #fff;
+    text-align: right;
+}
+
+/* Style chatbot message */
+#chat-display div:nth-child(even) {
+    background-color: #ddd;
+    color: #333;
+    text-align: left;
+}
+
+    </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-output" id="chat-output">
-            <!-- Messages will be displayed here -->
+    <div id="chat-container">
+        <div id="chat-display">
+            <!-- Chat messages will be displayed here -->
         </div>
-        <div class="user-input">
-            <input type="text" id="user-message" placeholder="Type your message...">
-            <button onclick="sendMessage()">Send</button>
-        </div>
+        <input type="text" id="user-input" placeholder="Type a message...">
+        <button id="send-button">Send</button>
     </div>
+    <script>
+        const chatDisplay = document.getElementById('chat-display');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
 
-    <script src="script.js"></script>
+        sendButton.addEventListener('click', async () => {
+            const userMessage = userInput.value;
+            appendMessage('User', userMessage);
+            userInput.value = '';
+
+            // Send userMessage to your backend for processing
+            const botResponse = await sendMessageToBackend(userMessage);
+            appendMessage('Chatbot', botResponse);
+        });
+
+        function appendMessage(sender, message) {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = `${sender}: ${message}`;
+            chatDisplay.appendChild(messageElement);
+        }
+
+        async function sendMessageToBackend(userMessage) {
+            // Make an API request to your backend with the userMessage
+            const response = await fetch('/api/chatbot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: userMessage }),
+            });
+
+            if (!response.ok) {
+                return 'Error processing your request.';
+            }
+
+            const data = await response.json();
+            return data.botResponse;
+        }
+    </script>
 </body>
 </html>
