@@ -24,13 +24,23 @@ app.post('/api/chatbot', async (req, res) => {
 });
 
 async function openAIChat(userMessage) {
-    // Make a request to the OpenAI API with userMessage
-    // Handle authentication and API call here using your chosen library
-    // Example: Replace with the actual OpenAI API call
-    const response = await OpenAIApi.sendMessage(userMessage, apiKey);
+    try {
+        // Make a request to the OpenAI API with userMessage
+        // Handle authentication and API call here using your chosen library
+        // Example: Replace with the actual OpenAI API call
+        const response = await OpenAIApi.createCompletion({
+            model: "text-davinci-002", // Use the appropriate model name
+            prompt: userMessage,
+            max_tokens: 50, // Adjust as needed
+            api_key: apiKey, // Your OpenAI API key
+        });
 
-    // Extract and return the chatbot's response from the API response
-    return response.data.choices[0].text.trim();
+        // Extract and return the chatbot's response from the API response
+        return response.choices[0].text.trim();
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 }
 
 app.listen(port, () => {
